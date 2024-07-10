@@ -23,17 +23,17 @@ workflows:
     triggering:
       events:
         - pull_request 
-      branch_patterns: 
-        - pattern: 'story/*'
-          include: true
-          source: true  
-        - pattern: 'sprint/*'
-          include: true
-          source: true  
-        - pattern: 'main'
-          include: false
-          source: false 
-      cancel_previous_builds: false
+      # branch_patterns: 
+      #   - pattern: 'story/*'
+      #     include: true
+      #     source: true  
+      #   - pattern: 'sprint/*'
+      #     include: true
+      #     source: true  
+      #   - pattern: 'main'
+      #     include: false
+      #     source: false 
+      # cancel_previous_builds: false
     when:
         changeset:
           includes:
