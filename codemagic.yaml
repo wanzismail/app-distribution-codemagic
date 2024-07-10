@@ -38,8 +38,6 @@ workflows:
         changeset:
           includes:
             - 'metadata/versions/'
-          excludes:
-            - '**/*.md'
 
     # Build Scripts
     scripts:
@@ -186,8 +184,6 @@ workflows:
         changeset:
           includes:
             - 'metadata/versions/'
-          excludes:
-            - '**/*.md'
 
     # Build Scripts
     scripts:
