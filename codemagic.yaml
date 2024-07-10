@@ -21,12 +21,12 @@ workflows:
 
     # Trigger Configuration 
     triggering:
-      # events:
-      #   - pull_request 
-      # branch_patterns: 
-      #   - pattern: 'story/*'
-      #     include: true
-      #     source: true  
+      events:
+        - pull_request 
+      branch_patterns: 
+        - pattern: 'story/*'
+          include: true
+          source: true  
       #   - pattern: 'sprint/*'
       #     include: true
       #     source: true  
