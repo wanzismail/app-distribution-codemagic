@@ -26,7 +26,7 @@ workflows:
       branch_patterns: 
         - pattern: 'story/*'
           include: true
-          source: true  
+          source: false 
       #   - pattern: 'sprint/*'
       #     include: true
       #     source: true  
