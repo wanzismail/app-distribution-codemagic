@@ -1,0 +1,295 @@
+workflows:
+  # Android Staging Build Workflow
+  android-staging-workflow:
+    name: Android Staging Build and Deploy
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+
+    # Environment Configuration
+    environment:
+      groups:
+        - keystore_credentials
+        - firebase_credentials
+      android_signing:
+        - keystore_reference
+      flutter: stable
+
+    # Cache Configuration
+    cache:
+      cache_paths:
+        - ~/.pub-cache
+
+    # Trigger Configuration 
+    triggering:
+      events:
+        - pull_request 
+      branch_patterns: 
+        - pattern: 'story/*'
+          include: true
+          source: true  
+        - pattern: 'sprint/*'
+          include: true
+          source: true  
+        - pattern: 'main'
+          include: false
+          source: false 
+      cancel_previous_builds: false
+    when:
+        changeset:
+          includes:
+            - '/metadata/versions/'
+          excludes:
+            - '**/*.md'
+
+    # Build Scripts
+    scripts:
+      # Prepare and Verify Keystore
+      - name: Prepare key.properties
+        script: |
+          echo "storePassword=$CM_KEYSTORE_PASSWORD" >> "$CM_BUILD_DIR/android/key.properties"
+          echo "keyPassword=$CM_KEY_PASSWORD" >> "$CM_BUILD_DIR/android/key.properties"
+          echo "keyAlias=$CM_KEY_ALIAS" >> "$CM_BUILD_DIR/android/key.properties"
+          echo "storeFile=$CM_KEYSTORE_PATH" >> "$CM_BUILD_DIR/android/key.properties"
+      - name: Verify key.properties
+        script: |
+          if [ ! -f "$CM_BUILD_DIR/android/key.properties" ]; then
+            echo "Error: key.properties file not found!"
+            exit 1
+          fi
+      - name: Print key.properties
+        script: |
+          echo "Contents of key.properties:"
+          cat "$CM_BUILD_DIR/android/key.properties"
+
+      # Prepare Flutter Environment
+      - name: Prepare local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" >> "$CM_BUILD_DIR/android/local.properties"
+
+      # Prepare Release Notes and Version Information
+      - name: Prepare Release Notes
+        script: |
+          RELEASE_NOTES_FILE="metadata/release_notes/staging"
+          if [ ! -f "$RELEASE_NOTES_FILE" ]; then
+            echo "Error: Release notes file not found at $RELEASE_NOTES_FILE"
+            exit 1
+          fi
+          cp "$RELEASE_NOTES_FILE" release_notes_en-US.txt
+
+      - name: Get version from metadata and set version to environment
+        script: |
+          #!/bin/bash
+
+          metadata_file="metadata/versions/staging"  # Path to the metadata file
+
+          # Ensure metadata file exists
+          if [ ! -f "$metadata_file" ]; then
+            echo "Error: Metadata file not found at $metadata_file"
+            exit 1
+          fi
+
+          # Read values from metadata 
+          VERSION_NAME=$(grep VERSION_NAME= $metadata_file | cut -d= -f2)
+          VERSION_CODE=$(grep VERSION_CODE= $metadata_file | cut -d= -f2)
+          PREFIX=$(grep PREFIX= $metadata_file | cut -d= -f2)
+          BUILD_NUMBER=$(grep BUILD_NUMBER= $metadata_file | cut -d= -f2)
+
+
+          # Validate required variables
+          if [ -z "$VERSION_NAME" ] || [ -z "$VERSION_CODE" ] || [ -z "$PREFIX" ] || [ -z "$BUILD_NUMBER" ]; then
+            echo "Error: Missing required version information in metadata."
+            exit 1
+          fi
+
+          # Construct the full version name
+          FULL_VERSION_NAME="$VERSION_NAME.$PREFIX.$BUILD_NUMBER"
+
+          # Display current values
+          echo "Current BUILD_NUMBER: $BUILD_NUMBER"
+          echo "Current FULL_VERSION_NAME: $FULL_VERSION_NAME"
+          echo "Current VERSION_CODE: $VERSION_CODE"
+          cat "$metadata_file"
+
+          # Update the metadata file with the new build number
+          sed -i "/BUILD_NUMBER=/c\BUILD_NUMBER=$BUILD_NUMBER" "$metadata_file"
+          cat "$metadata_file"
+
+          # Store variables in Codemagic environment
+          echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $CM_ENV
+
+      # Build the Staging APK
+      - name: Get Flutter packages
+        script: flutter packages pub get
+
+      - name: Build Staging APK
+        script: flutter build apk --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor staging -t lib/main_staging.dart
+
+    # Artifacts (APK, Mapping File, Logs)
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/mapping
+      - flutter_drive.log
+
+    # Publishing (Email and Firebase App Distribution)
+    publishing:
+      email:
+        recipients:
+          - ismail.ridwan98@gmail.com
+        notify:
+          success: true
+          failure: false
+      firebase:
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        android:
+          app_id: $FIREBASE_ANDROID_STAGING_APP_ID
+          groups:
+            - mobiledev
+          artifact_type: 'apk'
+
+  # Android Production Build Workflow
+  android-production-workflow:
+    name: Android Production Build and Deploy
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+
+    # Environment Configuration
+    environment:
+      groups:
+        - keystore_credentials
+        - firebase_credentials
+      android_signing:
+        - keystore_reference
+      flutter: stable
+
+    # Cache Configuration
+    cache:
+      cache_paths:
+        - ~/.pub-cache
+
+    # Trigger Configuration 
+    triggering:
+      events:
+        - pull_request 
+      branch_patterns: 
+        - pattern: 'story/*'
+          include: false
+          source: false
+        - pattern: 'sprint/*'
+          include: true
+          source: true  
+        - pattern: 'main'
+          include: false
+          source: false 
+      cancel_previous_builds: false
+    when:
+        changeset:
+          includes:
+            - '/metadata/versions/'
+          excludes:
+            - '**/*.md'
+
+    # Build Scripts
+    scripts:
+      # Prepare and Verify Keystore
+      - name: Prepare key.properties
+        script: |
+          echo "storePassword=$CM_KEYSTORE_PASSWORD" >> "$CM_BUILD_DIR/android/key.properties"
+          echo "keyPassword=$CM_KEY_PASSWORD" >> "$CM_BUILD_DIR/android/key.properties"
+          echo "keyAlias=$CM_KEY_ALIAS" >> "$CM_BUILD_DIR/android/key.properties"
+          echo "storeFile=$CM_KEYSTORE_PATH" >> "$CM_BUILD_DIR/android/key.properties"
+      - name: Verify key.properties
+        script: |
+          if [ ! -f "$CM_BUILD_DIR/android/key.properties" ]; then
+            echo "Error: key.properties file not found!"
+            exit 1
+          fi
+      - name: Print key.properties
+        script: |
+          echo "Contents of key.properties:"
+          cat "$CM_BUILD_DIR/android/key.properties"
+
+      # Prepare Flutter Environment
+      - name: Prepare local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" >> "$CM_BUILD_DIR/android/local.properties"
+
+      # Prepare Release Notes and Version Information
+      - name: Prepare Release Notes
+        script: |
+          RELEASE_NOTES_FILE="metadata/release_notes/production"
+          if [ ! -f "$RELEASE_NOTES_FILE" ]; then
+            echo "Error: Release notes file not found at $RELEASE_NOTES_FILE"
+            exit 1
+          fi
+          cp "$RELEASE_NOTES_FILE" release_notes_en-US.txt
+
+      - name: Get version from metadata and set version to environment
+        script: |
+          #!/bin/bash
+
+          metadata_file="metadata/versions/production"  # Path to the metadata file
+
+          # Ensure metadata file exists
+          if [ ! -f "$metadata_file" ]; then
+            echo "Error: Metadata file not found at $metadata_file"
+            exit 1
+          fi
+
+          # Read values from metadata 
+          VERSION_NAME=$(grep VERSION_NAME= $metadata_file| cut -d= -f2)
+          VERSION_CODE=$(grep VERSION_CODE= $metadata_file| cut -d= -f2)
+          PREFIX=$(grep PREFIX= $metadata_file| cut -d= -f2)
+          BUILD_NUMBER=$(grep BUILD_NUMBER= $metadata_file| cut -d= -f2)
+
+          # Validate required variables
+          if [ -z "$VERSION_NAME" ] || [ -z "$VERSION_CODE" ] || [ -z "$PREFIX" ] || [ -z "$BUILD_NUMBER" ]; then
+            echo "Error: Missing required version information in metadata."
+            exit 1
+          fi
+
+          # Construct the full version name
+          FULL_VERSION_NAME="$VERSION_NAME.$PREFIX.$BUILD_NUMBER"
+
+          # Display current values
+          echo "Current BUILD_NUMBER: $BUILD_NUMBER"
+          echo "Current FULL_VERSION_NAME: $FULL_VERSION_NAME"
+          echo "Current VERSION_CODE: $VERSION_CODE"
+          cat "$metadata_file"
+
+          # Update the metadata file with the new build number
+          sed -i "/BUILD_NUMBER=/c\BUILD_NUMBER=$BUILD_NUMBER" "$metadata_file"
+          cat "$metadata_file"
+
+          # Store variables in Codemagic environment
+          echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $CM_ENV
+
+      # Build the Production APK
+      - name: Get Flutter packages
+        script: flutter packages pub get
+
+      - name: Build Staging APK
+        script: flutter build apk --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor production -t lib/main_production.dart
+
+    # Artifacts (APK, Mapping File, Logs)
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/mapping
+      - flutter_drive.log
+
+    # Publishing (Email and Firebase App Distribution)
+    publishing:
+      email:
+        recipients:
+          - ismail.ridwan98@gmail.com
+        notify:
+          success: true
+          failure: false
+      firebase:
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        android:
+          app_id: $FIREBASE_ANDROID_PRODUCTION_APP_ID
+          groups:
+            - mobiledev
+          artifact_type: 'apk'
