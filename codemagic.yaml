@@ -137,7 +137,7 @@ workflows:
           CAPTION=$(cat <<EOF
           /lapor Sidebar | Publish App Staging ke Firebase App Distribution ($FULL_VERSION_NAME)
           Peserta: $CM_USERNAME
-          Lampiran: https://console.firebase.google.com/project/e-office-jds/appdistribution/app/android:id.go.jabarprov.office.staging/releases
+          Lampiran: https://console.firebase.google.com/project/rental-app-codemagic/appdistribution/app/android:id.wanztudio.rentalapp.staging/releases
           EOF
           )
 
@@ -311,7 +311,7 @@ workflows:
           CAPTION=$(cat <<EOF
           /lapor Sidebar | Publish App Production ke Firebase App Distribution ($FULL_VERSION_NAME)
           Peserta: $CM_USERNAME
-          Lampiran: https://console.firebase.google.com/project/e-office-jds/appdistribution/app/android:id.go.jabarprov.office/releases
+          Lampiran: https://console.firebase.google.com/project/rental-app-codemagic/appdistribution/app/android:id.wanztudio.rentalapp/releases
           EOF
           )
 
