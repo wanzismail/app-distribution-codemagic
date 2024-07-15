@@ -24,6 +24,10 @@ workflows:
     triggering:
       events:
         - push
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
       cancel_previous_builds: false
 
     # Build Scripts
@@ -194,6 +198,10 @@ workflows:
     triggering:
       events:
         - push
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
       cancel_previous_builds: false
 
     # Build Scripts
