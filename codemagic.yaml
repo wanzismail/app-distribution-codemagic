@@ -170,7 +170,7 @@ workflows:
           app_id: $FIREBASE_ANDROID_STAGING_APP_ID
           groups:
             - mobiledev
-          artifact_type: '.apk'
+          artifact_type: 'apk'
 
   # Android Production Build Workflow
   android-production-workflow:
@@ -343,4 +343,4 @@ workflows:
           app_id: $FIREBASE_ANDROID_PRODUCTION_APP_ID
           groups:
             - mobiledev
-          artifact_type: '.apk'
+          artifact_type: 'apk'
