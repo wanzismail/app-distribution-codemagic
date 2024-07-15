@@ -100,11 +100,11 @@ workflows:
           echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
           echo "VERSION_CODE=$VERSION_CODE" >> $CM_ENV
 
-      # Build Staging App Bundle (.aab)
+      # Build Staging APK
       - name: Get Flutter packages
         script: flutter packages pub get
-      - name: Build Staging App Bundle
-        script: flutter build appbundle --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor staging -t lib/main_staging.dart
+      - name: Build Staging APK
+        script: flutter build apk --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor staging -t lib/main_staging.dart
 
       # Prepare Git Commit Author and Save to Environment
       - name: Get commit username
@@ -149,7 +149,7 @@ workflows:
 
     # Artifacts (APK, Mapping File, Logs)
     artifacts:
-      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/*.apk
       - build/**/outputs/**/mapping
       - flutter_drive.log
 
@@ -170,7 +170,7 @@ workflows:
           app_id: $FIREBASE_ANDROID_STAGING_APP_ID
           groups:
             - mobiledev
-          artifact_type: 'aab'
+          artifact_type: '.apk'
 
   # Android Production Build Workflow
   android-production-workflow:
@@ -273,11 +273,11 @@ workflows:
           echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
           echo "VERSION_CODE=$VERSION_CODE" >> $CM_ENV
 
-      # Build Production App Bundle (.aab)
+      # Build Production APK
       - name: Get Flutter packages
         script: flutter packages pub get
-      - name: Build Production App Bundle
-        script: flutter build appbundle --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor production -t lib/main_production.dart
+      - name: Build Production APK
+        script: flutter build apk --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor production -t lib/main_production.dart
       
       # Prepare Git Commit Author and Save to Environment
       - name: Get commit username
@@ -322,7 +322,7 @@ workflows:
 
     # Artifacts (APK, Mapping File, Logs)
     artifacts:
-      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/*..apk
       - build/**/outputs/**/mapping
       - flutter_drive.log
 
@@ -343,4 +343,4 @@ workflows:
           app_id: $FIREBASE_ANDROID_PRODUCTION_APP_ID
           groups:
             - mobiledev
-          artifact_type: 'aab'
+          artifact_type: '.apk'
