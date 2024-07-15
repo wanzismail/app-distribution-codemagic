@@ -9,9 +9,10 @@ workflows:
     environment:
       groups:
         - keystore_credentials
-        - firebase_credentials
+        - firebase_credentials_sample
+        - others
       android_signing:
-        - keystore_reference
+        - keystore_reference_sample
       flutter: stable
 
     # Cache Configuration
@@ -22,22 +23,8 @@ workflows:
     # Trigger Configuration 
     triggering:
       events:
-        - pull_request 
-      branch_patterns: 
-        - pattern: 'story/*'
-          include: true
-          source: false 
-      #   - pattern: 'sprint/*'
-      #     include: true
-      #     source: true  
-      #   - pattern: 'main'
-      #     include: false
-      #     source: false 
-      # cancel_previous_builds: false
-    when:
-        changeset:
-          includes:
-            - 'metadata/versions/'
+        - push
+      cancel_previous_builds: false
 
     # Build Scripts
     scripts:
@@ -73,7 +60,6 @@ workflows:
             exit 1
           fi
           cp "$RELEASE_NOTES_FILE" release_notes_en-US.txt
-
       - name: Get version from metadata and set version to environment
         script: |
           #!/bin/bash
@@ -92,7 +78,6 @@ workflows:
           PREFIX=$(grep PREFIX= $metadata_file | cut -d= -f2)
           BUILD_NUMBER=$(grep BUILD_NUMBER= $metadata_file | cut -d= -f2)
 
-
           # Validate required variables
           if [ -z "$VERSION_NAME" ] || [ -z "$VERSION_CODE" ] || [ -z "$PREFIX" ] || [ -z "$BUILD_NUMBER" ]; then
             echo "Error: Missing required version information in metadata."
@@ -108,24 +93,60 @@ workflows:
           echo "Current VERSION_CODE: $VERSION_CODE"
           cat "$metadata_file"
 
-          # Update the metadata file with the new build number
-          sed -i "/BUILD_NUMBER=/c\BUILD_NUMBER=$BUILD_NUMBER" "$metadata_file"
-          cat "$metadata_file"
-
           # Store variables in Codemagic environment
           echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
           echo "VERSION_CODE=$VERSION_CODE" >> $CM_ENV
 
-      # Build the Staging APK
+      # Build Staging App Bundle (.aab)
       - name: Get Flutter packages
         script: flutter packages pub get
+      - name: Build Staging App Bundle
+        script: flutter build appbundle --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor staging -t lib/main_staging.dart
 
-      - name: Build Staging APK
-        script: flutter build apk --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor staging -t lib/main_staging.dart
+      # Prepare Git Commit Author and Save to Environment
+      - name: Get commit username
+        script: |
+          #!/bin/bash
+          
+          # Get the author's name from the latest commit
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+          echo "Original commit author username: $COMMIT_AUTHOR"  # Display the original author name
+
+          # Validate author name (case-insensitive) and set the username
+          if [[ $(echo "$COMMIT_AUTHOR" | tr '[:upper:]' '[:lower:]') == *"ismail"* ]]; then
+              COMMIT_AUTHOR_USERNAME="@wanzismail" 
+          else
+              COMMIT_AUTHOR_USERNAME="@harissetiyono"
+          fi
+
+          echo "Final commit author username: $COMMIT_AUTHOR_USERNAME"  # Display the final username
+
+          # Save to environment variables for later use
+          echo "CM_USERNAME=$COMMIT_AUTHOR_USERNAME" >> $CM_ENV
+
+      # Create Evidence via Telegram
+      - name: Send Telegram notification
+        script: |
+          #!/bin/bash
+        
+          # Construct the message caption
+          CAPTION=$(cat <<EOF
+          /lapor Sidebar | Publish App Staging ke Firebase App Distribution ($FULL_VERSION_NAME)
+          Peserta: $CM_USERNAME
+          Lampiran: https://console.firebase.google.com/project/e-office-jds/appdistribution/app/android:id.go.jabarprov.office.staging/releases
+          EOF
+          )
+
+          # Send the message and photo to Telegram
+          curl -X POST \
+          -F chat_id="$TELEGRAM_CHAT_ID" \
+          -F photo="$EVIDENCE_PHOTO_URL" \
+          -F caption="$CAPTION" \
+          https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendPhoto
 
     # Artifacts (APK, Mapping File, Logs)
     artifacts:
-      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping
       - flutter_drive.log
 
@@ -138,12 +159,15 @@ workflows:
           success: true
           failure: false
       firebase:
-        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        # use this line to authenticate via service account
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT_SAMPLE
+        # or this line to authenticate via token:
+        # firebase_token: $FIREBASE_TOKEN
         android:
-          app_id: $FIREBASE_ANDROID_STAGING_APP_ID
+          app_id: $FIREBASE_ANDROID_STAGING_APP_ID_SAMPLE
           groups:
             - mobiledev
-          artifact_type: 'apk'
+          artifact_type: 'aab'
 
   # Android Production Build Workflow
   android-production-workflow:
@@ -155,9 +179,10 @@ workflows:
     environment:
       groups:
         - keystore_credentials
-        - firebase_credentials
+        - firebase_credentials_sample
+        - others
       android_signing:
-        - keystore_reference
+        - keystore_reference_sample
       flutter: stable
 
     # Cache Configuration
@@ -168,22 +193,8 @@ workflows:
     # Trigger Configuration 
     triggering:
       events:
-        - pull_request 
-      branch_patterns: 
-        - pattern: 'story/*'
-          include: false
-          source: false
-        - pattern: 'sprint/*'
-          include: true
-          source: true  
-        - pattern: 'main'
-          include: false
-          source: false 
+        - push
       cancel_previous_builds: false
-    when:
-        changeset:
-          includes:
-            - 'metadata/versions/'
 
     # Build Scripts
     scripts:
@@ -219,7 +230,6 @@ workflows:
             exit 1
           fi
           cp "$RELEASE_NOTES_FILE" release_notes_en-US.txt
-
       - name: Get version from metadata and set version to environment
         script: |
           #!/bin/bash
@@ -253,24 +263,60 @@ workflows:
           echo "Current VERSION_CODE: $VERSION_CODE"
           cat "$metadata_file"
 
-          # Update the metadata file with the new build number
-          sed -i "/BUILD_NUMBER=/c\BUILD_NUMBER=$BUILD_NUMBER" "$metadata_file"
-          cat "$metadata_file"
-
           # Store variables in Codemagic environment
           echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
           echo "VERSION_CODE=$VERSION_CODE" >> $CM_ENV
 
-      # Build the Production APK
+      # Build Production App Bundle (.aab)
       - name: Get Flutter packages
         script: flutter packages pub get
+      - name: Build Production App Bundle
+        script: flutter build appbundle --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor production -t lib/main_production.dart
+      
+      # Prepare Git Commit Author and Save to Environment
+      - name: Get commit username
+        script: |
+          #!/bin/bash
+          
+          # Get the author's name from the latest commit
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+          echo "Original commit author username: $COMMIT_AUTHOR"  # Display the original author name
 
-      - name: Build Staging APK
-        script: flutter build apk --build-name=$FULL_VERSION_NAME --build-number=$VERSION_CODE --release --flavor production -t lib/main_production.dart
+          # Validate author name (case-insensitive) and set the username
+          if [[ $(echo "$COMMIT_AUTHOR" | tr '[:upper:]' '[:lower:]') == *"ismail"* ]]; then
+              COMMIT_AUTHOR_USERNAME="@wanzismail" 
+          else
+              COMMIT_AUTHOR_USERNAME="@harissetiyono"
+          fi
+
+          echo "Final commit author username: $COMMIT_AUTHOR_USERNAME"  # Display the final username
+
+          # Save to environment variables for later use
+          echo "CM_USERNAME=$COMMIT_AUTHOR_USERNAME" >> $CM_ENV
+
+      # Create Evidence via Telegram
+      - name: Send Telegram notification
+        script: |
+          #!/bin/bash
+        
+          # Construct the message caption
+          CAPTION=$(cat <<EOF
+          /lapor Sidebar | Publish App Production ke Firebase App Distribution ($FULL_VERSION_NAME)
+          Peserta: $CM_USERNAME
+          Lampiran: https://console.firebase.google.com/project/e-office-jds/appdistribution/app/android:id.go.jabarprov.office/releases
+          EOF
+          )
+
+          # Send the message and photo to Telegram
+          curl -X POST \
+          -F chat_id="$TELEGRAM_CHAT_ID" \
+          -F photo="$EVIDENCE_PHOTO_URL" \
+          -F caption="$CAPTION" \
+          https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendPhoto
 
     # Artifacts (APK, Mapping File, Logs)
     artifacts:
-      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping
       - flutter_drive.log
 
@@ -283,9 +329,12 @@ workflows:
           success: true
           failure: false
       firebase:
-        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        # use this line to authenticate via service account
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT_SAMPLE
+        # or this line to authenticate via token:
+        # firebase_token: $FIREBASE_TOKEN
         android:
-          app_id: $FIREBASE_ANDROID_PRODUCTION_APP_ID
+          app_id: $FIREBASE_ANDROID_PRODUCTION_APP_ID_SAMPLE
           groups:
             - mobiledev
-          artifact_type: 'apk'
+          artifact_type: 'aab'
