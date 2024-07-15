@@ -8,7 +8,6 @@ workflows:
     # Environment Configuration
     environment:
       groups:
-        - keystore_credentials
         - firebase_credentials_sample
         - others
       android_signing:
@@ -135,7 +134,7 @@ workflows:
         
           # Construct the message caption
           CAPTION=$(cat <<EOF
-          /lapor Sidebar | Publish App Staging ke Firebase App Distribution ($FULL_VERSION_NAME)
+          /lapor Rental App | Publish App Staging ke Firebase App Distribution ($FULL_VERSION_NAME)
           Peserta: $CM_USERNAME
           Lampiran: https://console.firebase.google.com/project/rental-app-codemagic/appdistribution/app/android:id.wanztudio.rentalapp.staging/releases
           EOF
@@ -182,7 +181,6 @@ workflows:
     # Environment Configuration
     environment:
       groups:
-        - keystore_credentials
         - firebase_credentials_sample
         - others
       android_signing:
@@ -309,7 +307,7 @@ workflows:
         
           # Construct the message caption
           CAPTION=$(cat <<EOF
-          /lapor Sidebar | Publish App Production ke Firebase App Distribution ($FULL_VERSION_NAME)
+          /lapor Rental App | Publish App Production ke Firebase App Distribution ($FULL_VERSION_NAME)
           Peserta: $CM_USERNAME
           Lampiran: https://console.firebase.google.com/project/rental-app-codemagic/appdistribution/app/android:id.wanztudio.rentalapp/releases
           EOF
