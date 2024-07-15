@@ -8,10 +8,10 @@ workflows:
     # Environment Configuration
     environment:
       groups:
-        - firebase_credentials_sample
+        - firebase_credentials
         - others
       android_signing:
-        - keystore_reference_sample
+        - keystore_reference
       flutter: stable
 
     # Cache Configuration
@@ -163,11 +163,11 @@ workflows:
           failure: false
       firebase:
         # use this line to authenticate via service account
-        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT_SAMPLE
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
         # or this line to authenticate via token:
         # firebase_token: $FIREBASE_TOKEN
         android:
-          app_id: $FIREBASE_ANDROID_STAGING_APP_ID_SAMPLE
+          app_id: $FIREBASE_ANDROID_STAGING_APP_ID
           groups:
             - mobiledev
           artifact_type: 'aab'
@@ -181,10 +181,10 @@ workflows:
     # Environment Configuration
     environment:
       groups:
-        - firebase_credentials_sample
+        - firebase_credentials
         - others
       android_signing:
-        - keystore_reference_sample
+        - keystore_reference
       flutter: stable
 
     # Cache Configuration
@@ -336,11 +336,11 @@ workflows:
           failure: false
       firebase:
         # use this line to authenticate via service account
-        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT_SAMPLE
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
         # or this line to authenticate via token:
         # firebase_token: $FIREBASE_TOKEN
         android:
-          app_id: $FIREBASE_ANDROID_PRODUCTION_APP_ID_SAMPLE
+          app_id: $FIREBASE_ANDROID_PRODUCTION_APP_ID
           groups:
             - mobiledev
           artifact_type: 'aab'
