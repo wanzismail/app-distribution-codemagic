@@ -45,7 +45,6 @@ workflows:
           - 'metadata/versions/'
         excludes:
           - '**/*.md'
-          - 'codemagic.yaml'
 
     # Build Scripts
     scripts:
@@ -236,7 +235,6 @@ workflows:
           - 'metadata/versions/'
         excludes:
           - '**/*.md'
-          - 'codemagic.yaml'
 
     # Build Scripts
     scripts:
