@@ -27,18 +27,15 @@ workflows:
         - pattern: 'main'
           include: false
           source: false
-        - pattern: 'story/*'
+        - pattern: '{story,sprint}/*'
           include: true
           source: true
-        - pattern: 'sprint/*'
-          include: true
-          source: true
-      when:
-        changeset:
-          includes:
-            - 'metadata/versions/staging'
-          excludes:
-            - '**/*.md'
+      # when:
+      #   changeset:
+      #     includes:
+      #       - 'metadata/versions/staging'
+      #     excludes:
+      #       - '**/*.md'
       cancel_previous_builds: false
 
     # Build Scripts
