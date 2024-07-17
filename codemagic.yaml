@@ -33,12 +33,12 @@ workflows:
         - pattern: 'sprint/*'
           include: true
           source: true
-      # when:
-      #   changeset:
-      #     includes:
-      #       - 'metadata/versions/'
-      #     excludes:
-      #       - '**/*.md'
+      when:
+        changeset:
+          includes:
+            - 'metadata/versions/staging'
+          excludes:
+            - '**/*.md'
       cancel_previous_builds: false
 
     # Build Scripts
