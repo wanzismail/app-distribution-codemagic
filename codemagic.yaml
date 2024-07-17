@@ -38,14 +38,6 @@ workflows:
             include: true
         cancel_previous_builds: false
 
-    # File change validation
-    when:
-      changeset:
-        includes:
-          - 'metadata/versions/staging'
-        excludes:
-          - '**/*.md'
-
     # Build Scripts
     scripts:
       # Prepare and Verify Keystore
