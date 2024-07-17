@@ -24,7 +24,10 @@ workflows:
         events:
           - pull_request
         branch_patterns:
-          - pattern: '{main,feature}'
+          - pattern: 'main'
+            include: false
+            source: false
+          - pattern: 'feature'
             include: false
             source: false
           - pattern: '{story,sprint}/*'
