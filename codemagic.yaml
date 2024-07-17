@@ -33,18 +33,7 @@ workflows:
           - pattern: '{story,sprint}/*'
             include: true
             source: true
-        tag_patterns:
-          - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
-            include: true
         cancel_previous_builds: false
-
-    # File change validation
-    when:
-      changeset:
-        includes:
-          - 'metadata/versions/'
-        excludes:
-          - '**/*.md'
 
     # Build Scripts
     scripts:
@@ -211,28 +200,29 @@ workflows:
 
     # Trigger Configuration 
     triggering:
-        events:
-          - push
-        branch_patterns:
-          - pattern: 'main'
-            include: false
-            source: false
-          - pattern: 'feature'
-            include: false
-            source: false
-          - pattern: '{story,sprint}/*'
-            include: true
-            source: true
-        tag_patterns:
-          - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
-            include: true
-        cancel_previous_builds: false
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: false
+        - pattern: 'feature'
+          include: false
+          source: false
+        - pattern: '{story,sprint}/*'
+          include: true
+          source: true
+      tag_patterns:
+        - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
+          include: true
+      cancel_previous_builds: false
     
     # File change validation
     when:
       changeset:
         includes:
-          - 'metadata/versions/'
+          - 'metadata/versions/production'
         excludes:
           - '**/*.md'
 
