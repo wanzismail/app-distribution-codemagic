@@ -34,7 +34,7 @@ workflows:
       when:
         changeset:
           includes:
-            - 'metadata/versions/staging.version'
+            - '**/*.version'
 
     # Build Scripts
     scripts:
