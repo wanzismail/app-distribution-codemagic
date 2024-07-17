@@ -198,16 +198,6 @@ workflows:
       cache_paths:
         - ~/.pub-cache
 
-    # Trigger Configuration 
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: '*'
-          include: true
-          source: true
-      cancel_previous_builds: false
-
     # Build Scripts
     scripts:
       # Prepare and Verify Keystore
