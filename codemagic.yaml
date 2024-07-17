@@ -39,7 +39,7 @@ workflows:
     when:
       changeset:
         includes:
-          - 'metadata/versions/production'
+          - 'metadata/versions/staging'
         excludes:
           - '**/*.md'
 
@@ -148,7 +148,7 @@ workflows:
         
           # Construct the message caption
           CAPTION=$(cat <<EOF
-          /lapor Rental App | Publish App Staging ke Firebase App Distribution ($FULL_VERSION_NAME)
+          /lapor Rental App | Publish Rental App Staging v$FULL_VERSION_NAME ke Firebase App Distribution
           Peserta: $CM_USERNAME
           Lampiran: https://console.firebase.google.com/project/rental-app-codemagic/appdistribution/app/android:id.wanztudio.rentalapp.staging/releases
           EOF
@@ -342,7 +342,7 @@ workflows:
         
           # Construct the message caption
           CAPTION=$(cat <<EOF
-          /lapor Rental App | Publish App Production ke Firebase App Distribution ($FULL_VERSION_NAME)
+          /lapor Rental App | Publish Rental App Production v$FULL_VERSION_NAME ke Firebase App Distribution
           Peserta: $CM_USERNAME
           Lampiran: https://console.firebase.google.com/project/rental-app-codemagic/appdistribution/app/android:id.wanztudio.rentalapp/releases
           EOF
