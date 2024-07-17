@@ -35,6 +35,12 @@ workflows:
             source: true
         cancel_previous_builds: false
 
+    # File change validation
+    when:
+      changeset:
+        includes:
+          - 'metadata/versions'
+
     # Build Scripts
     scripts:
       # Prepare and Verify Keystore
