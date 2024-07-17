@@ -31,10 +31,12 @@ workflows:
             include: true
             source: true
         cancel_previous_builds: false
-      when:
-        changeset:
-          includes:
-            - '**/*.version'
+   
+    # File change validation
+    when:
+      changeset:
+        includes:
+          - 'metadata/versions'
 
     # Build Scripts
     scripts:
