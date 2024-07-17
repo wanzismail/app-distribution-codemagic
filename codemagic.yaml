@@ -34,7 +34,7 @@ workflows:
             include: true
             source: true
         tag_patterns:
-          - pattern: '*'
+          - pattern: 'example'
             include: true
         cancel_previous_builds: false
 
