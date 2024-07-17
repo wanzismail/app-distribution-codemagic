@@ -34,7 +34,7 @@ workflows:
             include: true
             source: true
         tag_patterns:
-          - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
+          - pattern: '*'
             include: true
         cancel_previous_builds: false
 
