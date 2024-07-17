@@ -39,7 +39,7 @@ workflows:
     when:
       changeset:
         includes:
-          - 'metadata/versions'
+          - 'metadata/versions/'
 
     # Build Scripts
     scripts:
