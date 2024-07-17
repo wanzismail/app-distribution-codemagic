@@ -32,7 +32,7 @@ workflows:
           source: true
         - pattern: 'sprint/*'
           include: true
-          source: false
+          source: true
       when:
         changeset:
           includes:
