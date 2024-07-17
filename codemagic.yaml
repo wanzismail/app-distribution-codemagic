@@ -21,25 +21,30 @@ workflows:
 
     # Trigger Configuration 
     triggering:
-      events:
-        - pull_request
-      branch_patterns:
-        - pattern: 'main'
-          include: false
-          source: false
-        - pattern: 'story/*'
-          include: true
-          source: false
-        - pattern: 'sprint/*'
-          include: true
-          source: false
-      when:
-        changeset:
-          includes:
-            - 'metadata/versions/'
-          excludes:
-            - '**/*.md'
-      cancel_previous_builds: false
+        events:
+          - push
+        branch_patterns:
+          - pattern: 'main'
+            include: false
+            source: false
+          - pattern: 'feature'
+            include: false
+            source: false
+          - pattern: '{story,sprint}/*'
+            include: true
+            source: true
+        tag_patterns:
+          - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
+            include: true
+        cancel_previous_builds: false
+
+    # File change validation
+    when:
+      changeset:
+        includes:
+          - 'metadata/versions/'
+        excludes:
+          - '**/*.md'
 
     # Build Scripts
     scripts:
@@ -206,13 +211,30 @@ workflows:
 
     # Trigger Configuration 
     triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: '*'
-          include: true
-          source: true
-      cancel_previous_builds: false
+        events:
+          - push
+        branch_patterns:
+          - pattern: 'main'
+            include: false
+            source: false
+          - pattern: 'feature'
+            include: false
+            source: false
+          - pattern: '{story,sprint}/*'
+            include: true
+            source: true
+        tag_patterns:
+          - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
+            include: true
+        cancel_previous_builds: false
+    
+    # File change validation
+    when:
+      changeset:
+        includes:
+          - 'metadata/versions/'
+        excludes:
+          - '**/*.md'
 
     # Build Scripts
     scripts:
