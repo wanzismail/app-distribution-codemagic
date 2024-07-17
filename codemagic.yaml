@@ -210,7 +210,10 @@ workflows:
         - pattern: 'feature'
           include: false
           source: false
-        - pattern: '{story,sprint}/*'
+        - pattern: 'story/*'
+          include: false
+          source: false
+        - pattern: 'sprint/*'
           include: true
           source: true
       tag_patterns:
