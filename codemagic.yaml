@@ -29,7 +29,7 @@ workflows:
             source: false
           - pattern: '{story,sprint}/*'
             include: true
-            source: true
+            source: false
         cancel_previous_builds: false
    
     # File change validation
