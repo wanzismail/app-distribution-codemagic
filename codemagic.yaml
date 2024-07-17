@@ -42,7 +42,7 @@ workflows:
     when:
       changeset:
         includes:
-          - 'metadata/versions/'
+          - 'metadata/versions/staging'
         excludes:
           - '**/*.md'
 
@@ -232,7 +232,7 @@ workflows:
     when:
       changeset:
         includes:
-          - 'metadata/versions/'
+          - 'metadata/versions/production'
         excludes:
           - '**/*.md'
 
