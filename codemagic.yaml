@@ -205,7 +205,7 @@ workflows:
         - tag
       branch_patterns:
         - pattern: 'main'
-          include: false
+          include: true
           source: false
         - pattern: 'feature'
           include: false
