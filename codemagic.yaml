@@ -34,12 +34,6 @@ workflows:
             include: true
             source: false
         cancel_previous_builds: false
-   
-    # File change validation
-    when:
-      changeset:
-        includes:
-          - 'metadata/versions'
 
     # Build Scripts
     scripts:
