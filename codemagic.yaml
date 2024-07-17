@@ -22,11 +22,23 @@ workflows:
     # Trigger Configuration 
     triggering:
       events:
-        - push
+        - pull_request
       branch_patterns:
-        - pattern: '*'
+        - pattern: 'main'
+          include: false
+          source: false
+        - pattern: 'story/*'
           include: true
-          source: true
+          source: false
+        - pattern: 'sprint/*'
+          include: true
+          source: false
+      when:
+        changeset:
+          includes:
+            - 'metadata/versions/'
+          excludes:
+            - '**/*.md'
       cancel_previous_builds: false
 
     # Build Scripts
