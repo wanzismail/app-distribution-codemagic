@@ -38,6 +38,12 @@ workflows:
             include: true
         cancel_previous_builds: false
 
+    # File change validation
+    when:
+      changeset:
+        includes:
+          - 'metadata/versions/'
+
     # Build Scripts
     scripts:
       # Prepare and Verify Keystore
@@ -203,13 +209,28 @@ workflows:
 
     # Trigger Configuration 
     triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: '*'
-          include: true
-          source: true
-      cancel_previous_builds: false
+        events:
+          - push
+        branch_patterns:
+          - pattern: 'main'
+            include: false
+            source: false
+          - pattern: 'feature'
+            include: false
+            source: false
+          - pattern: '{story,sprint}/*'
+            include: true
+            source: true
+        tag_patterns:
+          - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
+            include: true
+        cancel_previous_builds: false
+    
+    # File change validation
+    when:
+      changeset:
+        includes:
+          - 'metadata/versions/'
 
     # Build Scripts
     scripts:
