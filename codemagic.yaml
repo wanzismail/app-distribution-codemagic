@@ -29,7 +29,7 @@ workflows:
           source: false
         - pattern: 'story/*'
           include: true
-          source: false
+          source: true
         - pattern: 'sprint/*'
           include: true
           source: false
