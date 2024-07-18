@@ -39,7 +39,7 @@ workflows:
     when:
       changeset:
         includes:
-          - 'metadata/versions/staging'
+          - '.config/versions/staging'
         excludes:
           - '**/*.md'
 
@@ -71,33 +71,33 @@ workflows:
       # Prepare Release Notes and Version Information
       - name: Prepare Release Notes
         script: |
-          RELEASE_NOTES_FILE="metadata/release_notes/staging"
+          RELEASE_NOTES_FILE=".config/release_notes/staging"
           if [ ! -f "$RELEASE_NOTES_FILE" ]; then
             echo "Error: Release notes file not found at $RELEASE_NOTES_FILE"
             exit 1
           fi
           cp "$RELEASE_NOTES_FILE" release_notes_en-US.txt
-      - name: Get version from metadata and set version to environment
+      - name: Get version from config and set version to environment
         script: |
           #!/bin/bash
 
-          metadata_file="metadata/versions/staging"  # Path to the metadata file
+          config_file=".config/versions/staging"  # Path to the config file
 
-          # Ensure metadata file exists
-          if [ ! -f "$metadata_file" ]; then
-            echo "Error: Metadata file not found at $metadata_file"
+          # Ensure config file exists
+          if [ ! -f "$config_file" ]; then
+            echo "Error: Config file not found at $config_file"
             exit 1
           fi
 
-          # Read values from metadata 
-          VERSION_NAME=$(grep VERSION_NAME= $metadata_file | cut -d= -f2)
-          VERSION_CODE=$(grep VERSION_CODE= $metadata_file | cut -d= -f2)
-          PREFIX=$(grep PREFIX= $metadata_file | cut -d= -f2)
-          BUILD_NUMBER=$(grep BUILD_NUMBER= $metadata_file | cut -d= -f2)
+          # Read values from config 
+          VERSION_NAME=$(grep VERSION_NAME= $config_file | cut -d= -f2)
+          VERSION_CODE=$(grep VERSION_CODE= $config_file | cut -d= -f2)
+          PREFIX=$(grep PREFIX= $config_file | cut -d= -f2)
+          BUILD_NUMBER=$(grep BUILD_NUMBER= $config_file | cut -d= -f2)
 
           # Validate required variables
           if [ -z "$VERSION_NAME" ] || [ -z "$VERSION_CODE" ] || [ -z "$PREFIX" ] || [ -z "$BUILD_NUMBER" ]; then
-            echo "Error: Missing required version information in metadata."
+            echo "Error: Missing required version information in config."
             exit 1
           fi
 
@@ -108,7 +108,7 @@ workflows:
           echo "Current BUILD_NUMBER: $BUILD_NUMBER"
           echo "Current FULL_VERSION_NAME: $FULL_VERSION_NAME"
           echo "Current VERSION_CODE: $VERSION_CODE"
-          cat "$metadata_file"
+          cat "$config_file"
 
           # Store variables in Codemagic environment
           echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
@@ -233,7 +233,7 @@ workflows:
     when:
       changeset:
         includes:
-          - 'metadata/versions/production'
+          - '.config/versions/production'
         excludes:
           - '**/*.md'
 
@@ -265,33 +265,33 @@ workflows:
       # Prepare Release Notes and Version Information
       - name: Prepare Release Notes
         script: |
-          RELEASE_NOTES_FILE="metadata/release_notes/production"
+          RELEASE_NOTES_FILE=".config/release_notes/production"
           if [ ! -f "$RELEASE_NOTES_FILE" ]; then
             echo "Error: Release notes file not found at $RELEASE_NOTES_FILE"
             exit 1
           fi
           cp "$RELEASE_NOTES_FILE" release_notes_en-US.txt
-      - name: Get version from metadata and set version to environment
+      - name: Get version from config and set version to environment
         script: |
           #!/bin/bash
 
-          metadata_file="metadata/versions/production"  # Path to the metadata file
+          config_file=".config/versions/production"  # Path to the config file
 
-          # Ensure metadata file exists
-          if [ ! -f "$metadata_file" ]; then
-            echo "Error: Metadata file not found at $metadata_file"
+          # Ensure config file exists
+          if [ ! -f "$config_file" ]; then
+            echo "Error: Config file not found at $config_file"
             exit 1
           fi
 
-          # Read values from metadata 
-          VERSION_NAME=$(grep VERSION_NAME= $metadata_file| cut -d= -f2)
-          VERSION_CODE=$(grep VERSION_CODE= $metadata_file| cut -d= -f2)
-          PREFIX=$(grep PREFIX= $metadata_file| cut -d= -f2)
-          BUILD_NUMBER=$(grep BUILD_NUMBER= $metadata_file| cut -d= -f2)
+          # Read values from config 
+          VERSION_NAME=$(grep VERSION_NAME= $config_file| cut -d= -f2)
+          VERSION_CODE=$(grep VERSION_CODE= $config_file| cut -d= -f2)
+          PREFIX=$(grep PREFIX= $config_file| cut -d= -f2)
+          BUILD_NUMBER=$(grep BUILD_NUMBER= $config_file| cut -d= -f2)
 
           # Validate required variables
           if [ -z "$VERSION_NAME" ] || [ -z "$VERSION_CODE" ] || [ -z "$PREFIX" ] || [ -z "$BUILD_NUMBER" ]; then
-            echo "Error: Missing required version information in metadata."
+            echo "Error: Missing required version information in config."
             exit 1
           fi
 
@@ -302,7 +302,7 @@ workflows:
           echo "Current BUILD_NUMBER: $BUILD_NUMBER"
           echo "Current FULL_VERSION_NAME: $FULL_VERSION_NAME"
           echo "Current VERSION_CODE: $VERSION_CODE"
-          cat "$metadata_file"
+          cat "$config_file"
 
           # Store variables in Codemagic environment
           echo "FULL_VERSION_NAME=$FULL_VERSION_NAME" >> $CM_ENV
